@@ -1,13 +1,9 @@
 import $ from 'jquery';
 import _ from 'underscore';
-import React from 'react';
+import React from 'react/addons';
 import Router from 'react-router';
 import containerStore from '../stores/ContainerStore';
-import ContainerList from './ContainerList.react';
-import Header from './Header.react';
-import metrics from '../utils/MetricsUtil';
-import {shell} from 'electron';
-import machine from '../utils/DockerMachineUtil';
+//import ContainerList from './ContainerList.react';
 
 var Containers = React.createClass({
   contextTypes: {

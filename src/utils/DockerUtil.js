@@ -298,9 +298,7 @@ var DockerUtil = {
           if (repo.indexOf('/') === -1) {
             repo = 'local/' + repo;
           }
-          let repoSplit = repo.split('/');
-          list[idx].namespace = repoSplit.shift();
-          list[idx].name = repoSplit.join('/');
+          [list[idx].namespace, list[idx].name] = repo.split('/');
         });
         this.localImages = list;
         imageServerActions.updated(list);

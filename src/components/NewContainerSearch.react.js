@@ -4,14 +4,9 @@ import Router from 'react-router';
 import RetinaImage from 'react-retina-image';
 import ImageCard from './ImageCard.react';
 import Promise from 'bluebird';
-import metrics from '../utils/MetricsUtil';
 import classNames from 'classnames';
 import repositoryActions from '../actions/RepositoryActions';
 import repositoryStore from '../stores/RepositoryStore';
-import accountStore from '../stores/AccountStore';
-import accountActions from '../actions/AccountActions';
-import imageActions from '../actions/ImageActions';
-import imageStore from '../stores/ImageStore';
 
 var _searchPromise = null;
 
@@ -22,11 +17,6 @@ module.exports = React.createClass({
       query: '',
       loading: repositoryStore.loading(),
       repos: repositoryStore.all(),
-      images: imageStore.all(),
-      imagesErr: imageStore.error,
-      username: accountStore.getState().username,
-      verified: accountStore.getState().verified,
-      accountLoading: accountStore.getState().loading,
       error: repositoryStore.getState().error,
       currentPage: repositoryStore.getState().currentPage,
       totalPage: repositoryStore.getState().totalPage,
@@ -37,9 +27,7 @@ module.exports = React.createClass({
   componentDidMount: function () {
     this.refs.searchInput.getDOMNode().focus();
     repositoryStore.listen(this.update);
-    accountStore.listen(this.updateAccount);
-    imageStore.listen(this.updateImage);
-    repositoryActions.search();
+    repositoryActions.recommended();
   },
   componentWillUnmount: function () {
     if (_searchPromise) {
@@ -47,7 +35,6 @@ module.exports = React.createClass({
     }
 
     repositoryStore.unlisten(this.update);
-    accountStore.unlisten(this.updateAccount);
   },
   update: function () {
     this.setState({
@@ -67,39 +54,8 @@ module.exports = React.createClass({
     });
   },
   updateAccount: function () {
-    this.setState({
-      username: accountStore.getState().username,
-      verified: accountStore.getState().verified,
-      accountLoading: accountStore.getState().loading
-    });
   },
   search: function (query, page = 1) {
-    if (_searchPromise) {
-      _searchPromise.cancel();
-      _searchPromise = null;
-    }
-    let previousPage, nextPage, totalPage = null;
-    // If query remains, retain pagination
-    if (this.state.query === query) {
-      previousPage = (page - 1 < 1) ? 1 : page - 1;
-      nextPage = (page + 1 > this.state.totalPage) ? this.state.totalPage : page + 1;
-      totalPage = this.state.totalPage;
-    }
-    this.setState({
-      query: query,
-      loading: true,
-      currentPage: page,
-      previousPage: previousPage,
-      nextPage: nextPage,
-      totalPage: totalPage,
-      error: null
-    });
-
-    _searchPromise = Promise.delay(200).then(() => {
-      metrics.track('Searched for Images');
-      _searchPromise = null;
-      repositoryActions.search(query, page);
-    }).catch(Promise.CancellationError, () => {});
   },
   handleChange: function (e) {
     let query = e.target.value;
@@ -121,25 +77,13 @@ module.exports = React.createClass({
       repositoryActions.repos();
     }
 
-    if (filter === 'userimages' && this.getQuery().filter === 'userimages') {
-      imageActions.all();
-    }
-
     if (filter === 'recommended' && this.getQuery().filter === 'recommended') {
       repositoryActions.recommended();
     }
 
     this.transitionTo('search', {}, {filter: filter});
-
-    metrics.track('Filtered Results', {
-      filter: filter
-    });
   },
   handleCheckVerification: function () {
-    accountActions.verify();
-    metrics.track('Verified Account', {
-      from: 'search'
-    });
   },
   render: function () {
     let filter = this.getQuery().filter || 'all';
@@ -219,26 +163,6 @@ module.exports = React.createClass({
         </div>
       );
       paginateResults = null;
-    } else if (filter === 'userrepos' && !accountStore.getState().username) {
-      results = (
-        <div className="no-results">
-          <h2><Router.Link to="login">Log In</Router.Link> or <Router.Link to="signup">Sign Up</Router.Link> to access your Docker Hub repositories.</h2>
-          <RetinaImage src="connect-art.png" checkIfRetinaImgExists={false}/>
-        </div>
-      );
-      paginateResults = null;
-    } else if (filter === 'userrepos' && !accountStore.getState().verified) {
-      let spinner = this.state.accountLoading ? <div className="spinner la-ball-clip-rotate la-dark"><div></div></div> : null;
-      results = (
-        <div className="no-results">
-          <h2>Please verify your Docker Hub account email address</h2>
-          <div className="verify">
-            <button className="btn btn-action" onClick={this.handleCheckVerification}>{'I\'ve Verified My Email Address'}</button> {spinner}
-          </div>
-          <RetinaImage src="inspection.png" checkIfRetinaImgExists={false}/>
-        </div>
-      );
-      paginateResults = null;
     } else if (filter === 'userimages') {
       // filter out dangling images (aka images with no name/tag)
       let validImages = this.state.images.filter((image) => image.name !== '<none>');
@@ -269,7 +193,6 @@ module.exports = React.createClass({
       results = (
         {userImageResults}
       );
-      paginateResults = null;
     } else if (this.state.loading) {
       results = (
         <div className="no-results">

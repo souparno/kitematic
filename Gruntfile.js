@@ -33,7 +33,7 @@ module.exports = function (grunt) {
           platform: 'win32',
           arch: 'x64',
           asar: true,
-          icon: 'util/kitematic.ico',
+          icon: 'util/kitematic.ico'
         }
       },
       osx: {
@@ -46,7 +46,7 @@ module.exports = function (grunt) {
           arch: 'x64',
           asar: true,
           'app-version': packagejson.version,
-          icon: 'util/kitematic.icns',
+          icon: 'util/kitematic.icns'
         },
       },
       linux: {
@@ -60,7 +60,7 @@ module.exports = function (grunt) {
           asar: true,
           'app-bundle-id': 'com.kitematic.kitematic',
           'app-version': packagejson.version,
-          icon: 'util/kitematic.png',
+          icon: 'util/kitematic.png'
         }
       }
     },
@@ -70,7 +70,7 @@ module.exports = function (grunt) {
         files: [{
           expand: true,
           cwd: 'dist/' + BASENAME + '-win32-x64',
-          src: [BASENAME + '.exe'],
+          src: [BASENAME + '.exe']
         }],
         options: {
           icon: 'util/kitematic.ico',
@@ -104,13 +104,13 @@ module.exports = function (grunt) {
           dest: 'build/'
         }, {
           src: 'util/kitematic.icns',
-          dest: 'build/icon.icns',
+          dest: 'build/icon.icns'
         }, {
           src: 'util/kitematic.ico',
-          dest: 'build/icon.ico',
+          dest: 'build/icon.ico'
         }, {
           src: 'util/kitematic.png',
-          dest: 'build/icon.png',
+          dest: 'build/icon.png'
         }, {
           expand: true,
           cwd: 'fonts/',
@@ -144,16 +144,16 @@ module.exports = function (grunt) {
           dest: '<%= OSX_FILENAME %>/Contents/Resources/resources/'
         }],
         options: {
-          mode: true,
-        },
-      },
+          mode: true
+        }
+      }
     },
 
     // styles
     less: {
       options: {
         sourceMapFileInline: true,
-        javascriptEnabled: true,
+        javascriptEnabled: true
       },
       dist: {
         files: {
@@ -169,9 +169,9 @@ module.exports = function (grunt) {
           expand: true,
           cwd: 'src/',
           src: ['**/*.js'],
-          dest: 'build/',
-        }],
-      },
+          dest: 'build/'
+        }]
+      }
     },
 
     shell: {
@@ -180,9 +180,9 @@ module.exports = function (grunt) {
         options: {
           async: true,
           execOptions: {
-            env: env,
-          },
-        },
+            env: env
+          }
+        }
       },
       sign: {
         options: {
@@ -200,7 +200,7 @@ module.exports = function (grunt) {
       },
       linux_npm: {
         command: 'cd build && npm install --production'
-      },
+      }
     },
 
     clean: {
@@ -211,13 +211,13 @@ module.exports = function (grunt) {
       windows: {
         options: {
           archive: './release/' + VERSION_FILENAME + '-Windows.zip',
-          mode: 'zip',
+          mode: 'zip'
         },
         files: [{
           expand: true,
           dot: true,
           cwd: './dist/Kitematic-win32-x64',
-          src: '**/*',
+          src: '**/*'
         }],
       },
       osx: {
@@ -229,7 +229,7 @@ module.exports = function (grunt) {
           expand: true,
           dot: true,
           cwd: './dist/Kitematic-darwin-x64',
-          src: '**/*',
+          src: '**/*'
         }],
       },
       debian: {
@@ -241,9 +241,9 @@ module.exports = function (grunt) {
           expand: true,
           dot: true,
           cwd: './dist',
-          src: '*.deb',
-        }],
-      },
+          src: '*.deb'
+        }]
+      }
     },
 
     // livereload
@@ -278,7 +278,7 @@ module.exports = function (grunt) {
           name: 'Kitematic',
           icon: './util/kitematic.png',
           version: packagejson['electron-version'], // set version of electron
-          overwrite: true,
+          overwrite: true
         }
       },
       osxlnx: {
@@ -289,9 +289,9 @@ module.exports = function (grunt) {
           out: './dist/',
           name: 'Kitematic',
           version: packagejson['electron-version'], // set version of electron
-          overwrite: true,
+          overwrite: true
         }
-      },
+      }
     },
     'electron-installer-debian': {
       options: {
@@ -323,7 +323,7 @@ module.exports = function (grunt) {
         ],
         categories: [
           'Utility'
-        ],
+        ]
       },
       linux64: {
         options: {
@@ -333,7 +333,7 @@ module.exports = function (grunt) {
         dest: './dist/',
         rename: function (dest, src) {
           return OSX_OUT + '/' + VERSION_FILENAME + '_amd64.deb';
-        },
+        }
       },
       linux32: {
         options: {
@@ -343,7 +343,7 @@ module.exports = function (grunt) {
         dest: './dist/',
         rename: function (dest, src) {
           return OSX_OUT + '/' + VERSION_FILENAME + '_i386.deb';
-        },
+        }
       }
     },
     'electron-installer-redhat': {
@@ -358,13 +358,13 @@ module.exports = function (grunt) {
       },
       linux64: {
         options: {
-          arch: 'x86_64',
+          arch: 'x86_64'
         },
         src: './dist/Kitematic-linux-x64/',
         dest: './dist/',
         rename: function (dest, src) {
           return OSX_OUT + '/' + VERSION_FILENAME + '_amd64.rpm';
-        },
+        }
       },
       linux32: {
         options: {
@@ -374,17 +374,30 @@ module.exports = function (grunt) {
         dest: './dist/',
         rename: function (dest, src) {
           return OSX_OUT + '/' + VERSION_FILENAME + '_i386.rpm';
-        },
-      },
+        }
+      }
     },
+    uglify: {
+      build: {
+        src: 'build/main.js',
+        dest: 'build/main.min.js'
+      }
+    },
+    browserify: {
+      build: {
+        src: 'build/app.js',
+        dest: 'build/main.js'
+      }
+    }
   });
 
   // Load the plugins for linux packaging
   grunt.loadNpmTasks('grunt-electron-packager');
   grunt.loadNpmTasks('grunt-electron-installer-debian');
   grunt.loadNpmTasks('grunt-electron-installer-redhat');
+  grunt.loadNpmTasks('grunt-browserify');
 
-  grunt.registerTask('build', ['newer:babel', 'less', 'newer:copy:dev']);
+  grunt.registerTask('build', ['clean:release', 'less', 'newer:copy:dev', 'newer:babel', 'browserify', 'uglify']);
   grunt.registerTask('default', ['build', 'shell:electron', 'watch']);
 
   grunt.registerTask('release:linux', [

@@ -13,7 +13,6 @@ var Preferences = React.createClass({
       useVM: localStorage.getItem('settings.useVM') === 'true',
       metricsEnabled: metrics.enabled(),
       terminalShell: localStorage.getItem('settings.terminalShell') || "sh",
-      terminalPath: localStorage.getItem('settings.terminalPath') || "/usr/bin/xterm",
       startLinkedContainers: localStorage.getItem('settings.startLinkedContainers') === 'true'
     };
   },
@@ -59,13 +58,6 @@ var Preferences = React.createClass({
     });
     localStorage.setItem('settings.terminalShell', value);
   },
-  handleChangeTerminalPath: function (e) {
-    var value = e.target.value;
-    this.setState({
-      terminalPath: value
-    });
-    localStorage.setItem('settings.terminalPath', value);
-  },
   handleChangeStartLinkedContainers: function (e) {
     var checked = e.target.checked;
     this.setState({
@@ -74,7 +66,7 @@ var Preferences = React.createClass({
     localStorage.setItem('settings.startLinkedContainers', checked ? 'true' : 'false');
   },
   render: function () {
-    var vmSettings, vmShutdown, nativeSetting, linuxSettings;
+    var vmSettings, vmShutdown, nativeSetting;
 
     if (process.platform !== 'linux') {
       // We are on a Mac or Windows
@@ -112,21 +104,6 @@ var Preferences = React.createClass({
       );
     }
 
-    if (process.platform === "linux") {
-      linuxSettings = (
-        <div>
-          <div className="option">
-            <div className="option-name">
-              <label htmlFor="terminalPath">Terminal path</label>
-            </div>
-            <div className="option-value">
-              <input id="terminalPath" type="text" value={this.state.terminalPath} onChange={this.handleChangeTerminalPath}/>
-            </div>
-          </div>
-        </div>
-      )
-    }
-
     return (
       <div className="preferences">
         <div className="preferences-content">
@@ -160,7 +137,6 @@ var Preferences = React.createClass({
               <input id="startLinkedContainers" type="checkbox" checked={this.state.startLinkedContainers} onChange={this.handleChangeStartLinkedContainers}/>
             </div>
           </div>
-          {linuxSettings}
         </div>
       </div>
     );

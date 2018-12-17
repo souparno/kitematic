@@ -2,14 +2,11 @@ import _ from 'underscore';
 import alt from '../alt';
 import repositoryServerActions from '../actions/RepositoryServerActions';
 import repositoryActions from '../actions/RepositoryActions';
-import accountServerActions from '../actions/AccountServerActions';
-import accountStore from './AccountStore';
 
 class RepositoryStore {
   constructor () {
     this.bindActions(repositoryActions);
     this.bindActions(repositoryServerActions);
-    this.bindActions(accountServerActions);
     this.results = [];
     this.recommended = [];
     this.repos = [];
@@ -36,14 +33,8 @@ class RepositoryStore {
     this.setState({reposLoading: true});
   }
 
-  reposUpdated ({repos}) {
-    let accountState = accountStore.getState();
-
-    if (accountState.username && accountState.verified) {
-      this.setState({repos, reposLoading: false});
-    } else {
-      this.setState({repos: [], reposLoading: false});
-    }
+  reposUpdated ({repos}) {    
+    this.setState({repos: [], reposLoading: false});
   }
 
   search ({query, page}) {
@@ -65,7 +56,7 @@ class RepositoryStore {
   }
 
   recommendedUpdated ({repos}) {
-    this.setState({recommended: repos, recommendedLoading: false, error: null});
+    this.setState({recommended: repos, recommendedLoading: false});
   }
 
   loggedout () {

@@ -1,13 +1,13 @@
 import _ from 'underscore';
 import alt from '../alt';
 import containerServerActions from '../actions/ContainerServerActions';
-import containerActions from '../actions/ContainerActions';
+//import containerActions from '../actions/ContainerActions';
 
 let MAX_LOG_SIZE = 3000;
 
 class ContainerStore {
   constructor () {
-    this.bindActions(containerActions);
+    //this.bindActions(containerActions);
     this.bindActions(containerServerActions);
     this.containers = {};
 

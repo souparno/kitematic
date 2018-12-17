@@ -201,14 +201,13 @@ module.exports = {
     return linuxAbsPath.replace('/c', 'C:').split('/').join('\\');
   },
   linuxTerminal: function () {
-    const terminalPath = localStorage.getItem('settings.terminalPath');
-    if (fs.existsSync(terminalPath)) {
-      return [terminalPath, '-e'];
+    if (fs.existsSync('/usr/bin/x-terminal-emulator')) {
+      return ['/usr/bin/x-terminal-emulator', '-e'];
     } else {
       dialog.showMessageBox({
         type: 'warning',
         buttons: ['OK'],
-        message: `The ${terminalPath} does not exist please set the correct path.`
+        message: 'The symbolic link /usr/bin/x-terminal-emulator does not exist. Please read the Wiki at https://github.com/docker/kitematic/wiki/Early-Linux-Support for more information.'
       });
       return false;
     }

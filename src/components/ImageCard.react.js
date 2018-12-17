@@ -1,15 +1,7 @@
 import $ from 'jquery';
 import React from 'react/addons';
 import Router from 'react-router';
-import {shell} from 'electron';
 import RetinaImage from 'react-retina-image';
-import metrics from '../utils/MetricsUtil';
-import containerActions from '../actions/ContainerActions';
-import imageActions from '../actions/ImageActions';
-import containerStore from '../stores/ContainerStore';
-import tagStore from '../stores/TagStore';
-import tagActions from '../actions/TagActions';
-import networkActions from '../actions/NetworkActions';
 import networkStore from '../stores/NetworkStore';
 import numeral from 'numeral';
 import classNames from 'classnames';
@@ -18,124 +10,47 @@ var ImageCard = React.createClass({
   mixins: [Router.Navigation],
   getInitialState: function () {
     return {
-      tags: this.props.tags || [],
-      chosenTag: this.props.chosenTag || 'latest',
-      defaultNetwork: this.props.defaultNetwork || 'bridge',
-      networks: networkStore.all(),
-      searchTag: ''
+       tags: this.props.tags || [],
+      // chosenTag: this.props.chosenTag || 'latest',
+      // defaultNetwork: this.props.defaultNetwork || 'bridge',
+      networks: networkStore.all()
+      // searchTag: ''
     };
   },
   componentDidMount: function () {
-    tagStore.listen(this.updateTags);
-    networkStore.listen(this.updateNetworks);
   },
   componentWillUnmount: function () {
-    tagStore.unlisten(this.updateTags);
-    networkStore.unlisten(this.updateNetworks);
   },
   updateTags: function () {
-    let repo = this.props.image.namespace + '/' + this.props.image.name;
-    let state = tagStore.getState();
-    if (this.state.tags.length && !state.tags[repo]) {
-      $(this.getDOMNode()).find('.tag-overlay').fadeOut(300);
-    }
-    this.setState({
-      loading: tagStore.getState().loading[repo] || false,
-      tags: tagStore.getState().tags[repo] || []
-    });
   },
   updateNetworks: function () {
-    this.setState({
-      networks: networkStore.all()
-    });
   },
   handleTagClick: function (tag) {
-    this.setState({
-      chosenTag: tag
-    });
-    var $tagOverlay = $(this.getDOMNode()).find('.tag-overlay');
-    $tagOverlay.fadeOut(300);
-    metrics.track('Selected Image Tag');
   },
   handleNetworkClick: function (network) {
-    this.setState({
-      defaultNetwork: network
-    });
-    var $networkOverlay = $(this.getDOMNode()).find('.network-overlay');
-    $networkOverlay.fadeOut(300);
-    metrics.track('Selected Default Network');
   },
   handleClick: function () {
-    metrics.track('Created Container', {
-      from: 'search',
-      private: this.props.image.is_private,
-      official: this.props.image.namespace === 'library',
-      userowned: this.props.image.is_user_repo,
-      recommended: this.props.image.is_recommended,
-      local: this.props.image.is_local || false
-    });
-    let name = containerStore.generateName(this.props.image.name);
-    let localImage = this.props.image.is_local || false;
-    let repo = (this.props.image.namespace === 'library' || this.props.image.namespace === 'local') ? this.props.image.name : this.props.image.namespace + '/' + this.props.image.name;
-
-    containerActions.run(name, repo, this.state.chosenTag, this.state.defaultNetwork, localImage);
-    this.transitionTo('containerHome', {name});
   },
   handleMenuOverlayClick: function () {
-    let $menuOverlay = $(this.getDOMNode()).find('.menu-overlay');
-    $menuOverlay.fadeIn(300);
   },
   handleCloseMenuOverlay: function () {
-    var $menuOverlay = $(this.getDOMNode()).find('.menu-overlay');
-    $menuOverlay.fadeOut(300);
   },
   handleTagOverlayClick: function () {
-    let $tagOverlay = $(this.getDOMNode()).find('.tag-overlay');
-    $tagOverlay.fadeIn(300);
-    let localImage = this.props.image.is_local || false;
-    if (localImage) {
-      tagActions.localTags(this.props.image.namespace + '/' + this.props.image.name, this.props.tags);
-    } else {
-      tagActions.tags(this.props.image.namespace + '/' + this.props.image.name);
-    }
-    this.focusSearchTagInput();
   },
   handleCloseTagOverlay: function () {
-    let $menuOverlay = $(this.getDOMNode()).find('.menu-overlay');
-    $menuOverlay.hide();
-    var $tagOverlay = $(this.getDOMNode()).find('.tag-overlay');
-    $tagOverlay.fadeOut(300);
   },
   handleNetworkOverlayClick: function () {
-    let $networkOverlay = $(this.getDOMNode()).find('.network-overlay');
-    $networkOverlay.fadeIn(300);
   },
   handleCloseNetworkOverlay: function () {
-    let $menuOverlay = $(this.getDOMNode()).find('.menu-overlay');
-    $menuOverlay.hide();
-    var $networkOverlay = $(this.getDOMNode()).find('.network-overlay');
-    $networkOverlay.fadeOut(300);
   },
   handleDeleteImgClick: function (image) {
-    if (this.state.chosenTag && !this.props.image.inUse) {
-      imageActions.destroy(image.RepoTags[0].split(':')[0] + ':' + this.state.chosenTag);
-    }
   },
   handleRepoClick: function () {
-    var repoUri = 'https://hub.docker.com/';
-    if (this.props.image.namespace === 'library') {
-      repoUri = repoUri + '_/' + this.props.image.name;
-    } else {
-      repoUri = repoUri + 'r/' + this.props.image.namespace + '/' + this.props.image.name;
-    }
-    shell.openExternal(repoUri);
   },
   searchTag: function(event) {
-    this.setState({ searchTag: event.target.value });
   },
 
   focusSearchTagInput: function() {
-    this.refs.searchTagInput.getDOMNode().focus();
   },
 
   render: function() {

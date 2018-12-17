@@ -5,6 +5,7 @@ dist
 dist-electron-builder/
 release
 src/**/*.js.map
+src/**/*.js.swp
 installer
 node_modules
 coverage
@@ -26,3 +27,4 @@ settings.json
 
 # IDEs
 .idea
+nbproject
